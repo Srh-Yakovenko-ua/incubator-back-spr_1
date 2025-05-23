@@ -7,7 +7,6 @@ export const videosUpdatedDtoValidation = (data: Video): ValidationError[] => {
   const AUTHOR_MAX_LENGTH = 20;
   const ALLOWED_RESOLUTIONS = Object.values(VideoResolutions);
 
-  // Проверка title
   const title = data?.title?.trim();
   if (!title) {
     errors.push({ field: 'title', message: 'Title is required' });
@@ -18,7 +17,6 @@ export const videosUpdatedDtoValidation = (data: Video): ValidationError[] => {
     });
   }
 
-  // Проверка author
   const author = data?.author?.trim();
   if (!author) {
     errors.push({ field: 'author', message: 'Author is required' });
@@ -29,7 +27,6 @@ export const videosUpdatedDtoValidation = (data: Video): ValidationError[] => {
     });
   }
 
-  // Проверка availableResolutions
   const resolutions = data?.availableResolutions;
   if (!resolutions) {
     errors.push({ field: 'availableResolutions', message: 'Resolutions field is required' });
@@ -68,7 +65,6 @@ export const videosUpdatedDtoValidation = (data: Video): ValidationError[] => {
   if (!data?.publicationDate) {
     errors.push({ field: 'publicationDate', message: 'publicationDate is required' });
   } else {
-    // Проверяем, что это строка и соответствует ISO-формату
     const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
     if (typeof data.publicationDate !== 'string' || !isoDateRegex.test(data.publicationDate)) {
       errors.push({
@@ -77,7 +73,6 @@ export const videosUpdatedDtoValidation = (data: Video): ValidationError[] => {
           'publicationDate must be a valid ISO 8601 date string (e.g., "2025-05-23T18:20:03.000Z")',
       });
     } else {
-      // Дополнительная проверка, что дата не "ломает" JS Date
       const date = new Date(data.publicationDate);
       if (isNaN(date.getTime())) {
         errors.push({

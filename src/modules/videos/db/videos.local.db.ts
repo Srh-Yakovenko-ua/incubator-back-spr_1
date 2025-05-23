@@ -1,6 +1,6 @@
 import { Video, VideoResolutions } from '../types/videos';
 
-export const videosLocalDB: Video[] = [
+export let videosLocalDB: Video[] = [
   {
     id: 0,
     title: 'string',
