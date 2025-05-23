@@ -11,7 +11,7 @@ export const videosRouters = Router({});
 
 videosRouters
   .get('', (req: Request, res: Response) => {
-    res.status(200).send(videosLocalDB);
+    res.status(HttpStatuses.Ok).send(videosLocalDB);
   })
   .get('/:id', (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
@@ -53,7 +53,7 @@ videosRouters.put('/:id', (req: Request<{ id: string }>, res: Response) => {
   updateModel.minAgeRestriction = data.minAgeRestriction;
   updateModel.availableResolutions = data.availableResolutions;
 
-  res.status(HttpStatuses.Ok).send(updateModel);
+  res.status(HttpStatuses.NoContent).send(updateModel);
 });
 
 videosRouters.delete('/:id', (req: Request, res: Response) => {
