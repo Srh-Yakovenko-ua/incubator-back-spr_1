@@ -83,7 +83,7 @@ videosRouters.post('', (req: Request, res: Response) => {
   const data = req.body as Pick<Video, 'title' | 'author' | 'availableResolutions'>;
   const createdAt = new Date();
   const publicationDate = new Date(createdAt);
-  publicationDate.setDate(publicationDate.getDate() + 1); // Add 1 day
+  publicationDate.setDate(publicationDate.getDate() + 1);
   const newVideo: Video = {
     id: videosLocalDB.length ? videosLocalDB[videosLocalDB.length - 1].id + 1 : 0,
     title: data.title,

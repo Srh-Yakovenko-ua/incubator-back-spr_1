@@ -9,41 +9,44 @@ export const videosCreateDtoValidation = (data: CreateDtoType): ValidationError[
 
   const title = data?.title?.trim();
   if (!title) {
-    errors.push({ field: 'title', message: 'Title is required' });
+    errors.push({
+      message: 'Title is required',
+      field: 'title',
+    });
   } else if (title.length > TITLE_MAX_LENGTH) {
     errors.push({
-      field: 'title',
       message: `Title cannot exceed ${TITLE_MAX_LENGTH} characters`,
+      field: 'title',
     });
   }
 
   const author = data?.author?.trim();
   if (!author) {
-    errors.push({ field: 'author', message: 'Author is required' });
+    errors.push({ message: 'Author is required', field: 'author' });
   } else if (author.length > AUTHOR_MAX_LENGTH) {
     errors.push({
-      field: 'author',
       message: `Author name cannot exceed ${AUTHOR_MAX_LENGTH} characters`,
+      field: 'author',
     });
   }
 
   const resolutions = data?.availableResolutions;
 
   if (!resolutions) {
-    errors.push({ field: 'availableResolutions', message: 'Resolutions field is required' });
+    errors.push({ message: 'Resolutions field is required', field: 'availableResolutions' });
   } else if (!Array.isArray(resolutions)) {
-    errors.push({ field: 'availableResolutions', message: 'Resolutions must be an array' });
+    errors.push({ message: 'Resolutions must be an array', field: 'availableResolutions' });
   } else if (resolutions.length === 0) {
-    errors.push({ field: 'availableResolutions', message: 'At least one resolution is required' });
+    errors.push({ message: 'At least one resolution is required', field: 'availableResolutions' });
   } else {
     const invalidResolutions = resolutions.filter((res) => !ALLOWED_RESOLUTIONS.includes(res));
     console.log(invalidResolutions, 'invalidResolutions');
     if (invalidResolutions.length > 0) {
       errors.push({
-        field: 'availableResolutions',
         message:
           `Invalid resolutions detected: ${invalidResolutions.join(', ')}. ` +
           `Allowed values: ${ALLOWED_RESOLUTIONS.join(', ')}`,
+        field: 'availableResolutions',
       });
     }
   }
