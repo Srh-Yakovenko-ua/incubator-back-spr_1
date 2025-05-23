@@ -95,5 +95,5 @@ videosRouters.post('', (req: Request, res: Response) => {
     availableResolutions: data.availableResolutions,
   };
   videosLocalDB.push(newVideo);
-  res.send(newVideo).status(HttpStatuses.Created);
+  res.status(HttpStatuses.Created).send(newVideo);
 });
