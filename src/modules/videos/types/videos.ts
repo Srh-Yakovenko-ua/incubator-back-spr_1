@@ -19,3 +19,5 @@ export type Video = {
   publicationDate: Date;
   availableResolutions: VideoResolutions[];
 };
+
+export type CreateDtoType = Pick<Video, 'author' | 'title' | 'availableResolutions'>;

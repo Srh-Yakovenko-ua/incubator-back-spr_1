@@ -1,73 +1,76 @@
 import { Router, Request, Response } from 'express';
 import { videosLocalDB } from '../db/videos.local.db';
-import { Video, VideoResolutions } from '../types/videos';
-import { ValidationError } from '../../../shared/types/validation-error';
+import { Video } from '../types/videos';
+
 import { createErrorMessages } from '../../../shared/utils/errors';
 import { HttpStatuses } from '../../../shared/enums/http-statuses';
 
 export const videosRouters = Router({});
 
-videosRouters.get('', (req: Request, res: Response) => {
-  res.status(200).send(videosLocalDB);
+videosRouters
+  .get('', (req: Request, res: Response) => {
+    res.status(200).send(videosLocalDB);
+  })
+  .get('/:id', (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const videos = videosLocalDB.find((d) => d.id === id);
+
+    if (!videos) {
+      res
+        .status(HttpStatuses.NotFound)
+        .send(createErrorMessages([{ field: 'id', message: 'Video not found' }]));
+      return;
+    }
+    res.status(HttpStatuses.Ok).send(videos);
+  });
+
+videosRouters.put('/:id', (req: Request<{ id: string }>, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  const index = videosLocalDB.findIndex((v) => v.id === id);
+  if (index === -1) {
+    res
+      .status(HttpStatuses.NotFound)
+      .send(createErrorMessages([{ field: 'id', message: 'Video not found' }]));
+    return;
+  }
 });
 
-type CreateDtoType = Pick<Video, 'author' | 'title' | 'availableResolutions'>;
-const videosCreateDtoValidation = (data: CreateDtoType): ValidationError[] => {
-  const errors: ValidationError[] = [];
-  const TITLE_MAX_LENGTH = 40;
-  const AUTHOR_MAX_LENGTH = 20;
-  const ALLOWED_RESOLUTIONS = Object.values(VideoResolutions);
+videosRouters.delete('/:id', (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
 
-  const title = data?.title?.trim();
-  if (!title) {
-    errors.push({ field: 'title', message: 'Title is required' });
-  } else if (title.length > TITLE_MAX_LENGTH) {
-    errors.push({
-      field: 'title',
-      message: `Title cannot exceed ${TITLE_MAX_LENGTH} characters`,
-    });
+  const index = videosLocalDB.findIndex((v) => v.id === id);
+
+  if (index === -1) {
+    res
+      .status(HttpStatuses.NotFound)
+      .send(createErrorMessages([{ field: 'id', message: 'Video not found' }]));
+    return;
   }
 
-  const author = data?.author?.trim();
-  if (!author) {
-    errors.push({ field: 'author', message: 'Author is required' });
-  } else if (author.length > AUTHOR_MAX_LENGTH) {
-    errors.push({
-      field: 'author',
-      message: `Author name cannot exceed ${AUTHOR_MAX_LENGTH} characters`,
-    });
-  }
-
-  const resolutions = data?.availableResolutions;
-
-  if (!resolutions) {
-    errors.push({ field: 'availableResolutions', message: 'Resolutions field is required' });
-  } else if (!Array.isArray(resolutions)) {
-    errors.push({ field: 'availableResolutions', message: 'Resolutions must be an array' });
-  } else if (resolutions.length === 0) {
-    errors.push({ field: 'availableResolutions', message: 'At least one resolution is required' });
-  } else {
-    const invalidResolutions = resolutions.filter((res) => !ALLOWED_RESOLUTIONS.includes(res));
-    console.log(invalidResolutions, 'invalidResolutions');
-    if (invalidResolutions.length > 0) {
-      errors.push({
-        field: 'availableResolutions',
-        message:
-          `Invalid resolutions detected: ${invalidResolutions.join(', ')}. ` +
-          `Allowed values: ${ALLOWED_RESOLUTIONS.join(', ')}`,
-      });
-    }
-  }
-
-  return errors;
-};
+  videosLocalDB.splice(index, 1);
+  res.sendStatus(HttpStatuses.NoContent);
+});
 
 videosRouters.post('', (req: Request, res: Response) => {
   const errors = videosCreateDtoValidation(req.body);
+
   console.log(errors);
   if (errors.length > 0) {
     res.status(HttpStatuses.BadRequest).send(createErrorMessages(errors));
     return;
   }
-  res.send(req.body).status(200);
+  const data = req.body as Pick<Video, 'title' | 'author' | 'availableResolutions'>;
+  const newVideo = {
+    id: videosLocalDB[videosLocalDB.length - 1].id + 1,
+    title: data.title,
+    author: data.author,
+    minAgeRestriction: null,
+    canBeDownloaded: true,
+    createdAt: new Date().toISOString(),
+    publicationDate: new Date().toISOString(),
+    availableResolutions: data.availableResolutions,
+  };
+  videosLocalDB.push(newVideo);
+  res.send(newVideo).status(HttpStatuses.Created);
 });
