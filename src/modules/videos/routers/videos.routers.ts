@@ -82,7 +82,7 @@ videosRouters.post('', (req: Request, res: Response) => {
   }
   const data = req.body as Pick<Video, 'title' | 'author' | 'availableResolutions'>;
   const newVideo: Video = {
-    id: videosLocalDB[videosLocalDB.length - 1].id + 1,
+    id: videosLocalDB.length ? videosLocalDB[videosLocalDB.length - 1].id + 1 : 0,
     title: data.title,
     author: data.author,
     minAgeRestriction: null,
