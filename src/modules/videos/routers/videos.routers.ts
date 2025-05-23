@@ -81,14 +81,17 @@ videosRouters.post('', (req: Request, res: Response) => {
     return;
   }
   const data = req.body as Pick<Video, 'title' | 'author' | 'availableResolutions'>;
+  const createdAt = new Date();
+  const publicationDate = new Date(createdAt);
+  publicationDate.setDate(publicationDate.getDate() + 1); // Add 1 day
   const newVideo: Video = {
     id: videosLocalDB.length ? videosLocalDB[videosLocalDB.length - 1].id + 1 : 0,
     title: data.title,
     author: data.author,
     minAgeRestriction: null,
-    canBeDownloaded: true,
-    createdAt: new Date().toISOString(),
-    publicationDate: new Date().toISOString(),
+    canBeDownloaded: false,
+    createdAt: createdAt.toISOString(),
+    publicationDate: publicationDate.toISOString(),
     availableResolutions: data.availableResolutions,
   };
   videosLocalDB.push(newVideo);
