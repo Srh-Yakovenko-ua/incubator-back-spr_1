@@ -72,14 +72,7 @@ videosRouters.delete('/:id', (req: Request, res: Response) => {
   res.sendStatus(HttpStatuses.NoContent);
 });
 
-videosRouters.post('', (req: Request, res: Response) => {
-  const errors = videosCreateDtoValidation(req.body);
-
-  console.log(errors);
-  if (errors.length > 0) {
-    res.status(HttpStatuses.BadRequest).send(createErrorMessages(errors));
-    return;
-  }
+videosRouters.post('', videosCreateDtoValidation, (req: Request, res: Response) => {
   const data = req.body as Pick<Video, 'title' | 'author' | 'availableResolutions'>;
   const createdAt = new Date();
   const publicationDate = new Date(createdAt);

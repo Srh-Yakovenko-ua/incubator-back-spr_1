@@ -1,7 +1,11 @@
 import { ValidationError } from '../../../shared/types/validation-error';
 import { CreateDtoType, VideoResolutions } from '../types/videos';
+import { Response, Request, NextFunction } from 'express';
+import { HttpStatuses } from '../../../shared/enums/http-statuses';
+import { createErrorMessages } from '../../../shared/utils/errors';
+export const videosCreateDtoValidation = (req: Request, res: Response, next: NextFunction) => {
+  const data = req.body as CreateDtoType;
 
-export const videosCreateDtoValidation = (data: CreateDtoType): ValidationError[] => {
   const errors: ValidationError[] = [];
   const TITLE_MAX_LENGTH = 40;
   const AUTHOR_MAX_LENGTH = 20;
@@ -50,6 +54,10 @@ export const videosCreateDtoValidation = (data: CreateDtoType): ValidationError[
       });
     }
   }
+  if (errors.length > 0) {
+    res.status(HttpStatuses.BadRequest).send(createErrorMessages(errors));
+    return;
+  }
 
-  return errors;
+  next();
 };
